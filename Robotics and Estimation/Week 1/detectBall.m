@@ -19,12 +19,28 @@ function [segI, loc] = detectBall(I)
 %
 % mu = 
 % sig = 
-% thre = 
-
+thre = 10^-7;
+load('Model Parameters fit','mu','sig');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Find ball-color pixels using your model
-% 
+%
+% Change the standard deviation to covariance matrix:
+cov = diag(sig.^2);
+prob = zeros(size(I(:,:,1)));
+for i = 1 : size(I,2)
+    prob(:,i) = mvnpdf(double([I(:,i,1) I(:,i,2) I(:,i,3)]), mu, cov);
+end
+
+% Create the mask:
+mask = prob > thre;
+
+CC = bwconncomp(mask);
+% Filter out the biggest section from the mask and push it to Segmented
+% Image
+numPixels = cellfun(@numel,CC.PixelIdxList);
+[~,idx] = max(numPixels);
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,8 +55,12 @@ function [segI, loc] = detectBall(I)
 % Compute the location of the ball center
 %
 
-% segI = 
-% loc = 
+segI =  false(size(mask));
+segI(CC.PixelIdxList{idx}) = true;
+
+s = regionprops(CC, 'Centroid');
+loc = s(idx).Centroid;
+
 % 
 % Note: In this assigment, the center of the segmented ball area will be considered for grading. 
 % (You don't need to consider the whole ball shape if the ball is occluded.)

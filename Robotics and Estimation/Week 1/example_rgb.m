@@ -49,3 +49,24 @@ zlabel('Blue');
 % the sample data.
 %
 
+% Converting data from uint8 to double
+Samples = double(Samples);
+% Chosen 3 Dimensions of Gaussian model, as we have 3 Values: RGB
+D = 3;
+% Mean Estimate: 2 Ways
+muHat1 = zeros([3,1]);
+
+% Standard Deviation: 2 Ways
+sigHat1 = zeros([3,1]);
+
+% Number of Samples:
+N = size(Samples,1);
+% Doing first way:
+for i = 1 : D
+    muHat1(i) = mean(Samples(:,i));
+    sigHat1(i) = sqrt(sum((Samples(:,i) - muHat1(i)).^2)/N);
+end
+
+% Doing Second Way:
+[mu, sig] = normfit(Samples);
+save('Model Parameters fit','mu','sig')
