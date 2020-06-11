@@ -62,12 +62,18 @@ for j = 1:N % for each time,
     myMap = min(myMap,lo_max);
     myMap = max(myMap,lo_min);
     
-    % Visualize the map as needed
+    % Visualize the map as needed:
+    % Visualize the Bot. Comment out if not required
+    BotLocationX = currLoc(1)-5:currLoc(1)+5;
+    BotLocationY = currLoc(2)-5:currLoc(2)+5;
+    storedValue= myMap(BotLocationY, BotLocationX);
+    myMap(BotLocationY, BotLocationX) = 500;
+
     imagesc(myMap);
-    colormap('gray'); 
     axis equal;
     drawnow limitrate
-    
+    % Comment to see the path traced by BOT
+    myMap(BotLocationY, BotLocationX) = storedValue;
     % Display Iteration:
     fprintf("timestep: %d \n", j)
 end
