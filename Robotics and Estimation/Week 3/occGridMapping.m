@@ -10,7 +10,6 @@ function myMap = occGridMapping(ranges, scanAngles, pose, param)
 % 
 % % the number of grids for 1 meter.
 myResol = param.resol;
-r = param.resol;
 % % the initial map size in pixels
 myMap = zeros(param.size);
 % % the origin of the map in pixels
@@ -40,14 +39,6 @@ for j = 1:N % for each time,
     % Get the real Location of points
     pOcc = [d'.*cos(theta + a'); -d'.*sin(theta + a')] + [x; y];
     
-%     for angle = 1:n
-%       % Find grids hit by the rays (in the gird map coordinate)
-%       x_o(angle) = ranges(angle,j) * cos(scanAngles(angle,1) + pose(3,j)) + pose(1,j);
-%       y_o(angle) = -1*ranges(angle,j) * sin(scanAngles(angle,1) + pose(3,j)) + pose(2,j);
-%       occ= [ceil(x_o*r)+myorigin(1); ceil(y_o*r) + myorigin(2)];
-%       car = [ceil(pose(1,j)*r) + myorigin(1)  ceil(pose(2,j)*r) + myorigin(2)];
-%     end
-    
     % Get the indexed location of the Robot
     currLoc = ceil(myResol * [x;y]) + myorigin;
     
@@ -72,14 +63,14 @@ for j = 1:N % for each time,
     myMap = min(myMap,lo_max);
     myMap = max(myMap,lo_min);
     
-%     % Visualize the map as needed
-%     imagesc(myMap);
-%     colormap('gray'); 
-%     axis equal;
-%     drawnow limitrate
-%     
-%     % Display Iteration:
-%     fprintf("timestep: %d \n", j)
+    % Visualize the map as needed
+    imagesc(myMap);
+    colormap('gray'); 
+    axis equal;
+    drawnow limitrate
+    
+    % Display Iteration:
+    fprintf("timestep: %d \n", j)
 end
 
 end
