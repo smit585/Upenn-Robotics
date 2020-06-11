@@ -25,7 +25,6 @@ lo_min = param.lo_min;
 % with respect to the body frame
 a = scanAngles; 
 N = size(pose,2);
-n = size(a,1);
 for j = 1:N % for each time,
 
     % Get the poses at the current timeStemp
