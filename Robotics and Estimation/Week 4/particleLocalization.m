@@ -42,7 +42,7 @@ w = ones([1 M])/M;
 minScore = 1200;
 
 for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
-
+    fprintf("timestep %d: \n", j);
     % 1) Propagate the particles
     P(1,:) = P(1,:) + randn(1, M) * xVar;
     P(2,:) = P(2,:) + randn(1, M) * yVar;
@@ -100,8 +100,8 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
     [~, idx] = sort(w);
     m = w(idx(end));
     myPose(:,j) = P(:,idx(end));
-    bestPose1 = P(:,idx(1));
-    bestPose2 = P(:,idx(2));
+    WorstPose1 = P(:,idx(1));
+    WorstPose2 = P(:,idx(2));
     %   2-4) Choose the best particle to update the pose
     scoreFilter = min(m, minScore);
     idx = (w >= scoreFilter);
@@ -119,12 +119,15 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
     axis equal;
     plot(myPose(1,j)*param.resol+param.origin(1), ...
         myPose(2,j)*param.resol+param.origin(2), 'r.-', 'MarkerSize',20);
-    plot(bestPose1(1)*param.resol+param.origin(1), ...
-        bestPose1(2)*param.resol+param.origin(2), 'g.-', 'MarkerSize',20);
-    plot(bestPose2(1)*param.resol+param.origin(1), ...
-        bestPose2(2)*param.resol+param.origin(2), 'b.-', 'MarkerSize',20);
+    plot(WorstPose1(1)*param.resol+param.origin(1), ...
+        WorstPose1(2)*param.resol+param.origin(2), 'g.-', 'MarkerSize',20);
+    plot(WorstPose2(1)*param.resol+param.origin(1), ...
+        WorstPose2(2)*param.resol+param.origin(2), 'b.-', 'MarkerSize',20);
     drawnow limitrate
-
+    if mod(j,10) == 0
+        name = strcat('DemoImages/demo', num2str(j/10),'.png');
+        saveas(gcf, name)
+    end
 end
 
 end
