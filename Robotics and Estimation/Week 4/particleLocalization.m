@@ -26,7 +26,7 @@ myPose(:,1) = param.init_pose;
 
 % Decide the number of particles, M.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-M = 200;                            % Please decide a reasonable number of M, 
+M = 500;                            % Please decide a reasonable number of M, 
                                % based on your experiment using the practice data.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Create M number of particles
@@ -37,16 +37,16 @@ a = scanAngles;
 xVar = 0.02;
 yVar = 0.02;
 tVar = 0.02;
-MU = [0, 0, 0];
-Cov = diag([xVar, yVar, tVar]);
 w = ones([1 M])/M;
 
 minScore = 1200;
 
 for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
 
-    % 1) Propagate the particles 
-    P = P + mvnrnd(MU, Cov, M)';
+    % 1) Propagate the particles
+    P(1,:) = P(1,:) + randn(1, M) * xVar;
+    P(2,:) = P(2,:) + randn(1, M) * yVar;
+    P(3,:) = P(3,:) + randn(1, M) * tVar;
     
     % Get the range values from Lidar
     d = ranges(:,j);
@@ -97,8 +97,11 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
     %   2-2) For each particle, calculate the correlation scores of the particles
 
     %   2-3) Update the particle weights         
-    [m, idx] = max(w);
-    myPose(:,j) = P(:,idx);
+    [~, idx] = sort(w);
+    m = w(idx(end));
+    myPose(:,j) = P(:,idx(end));
+    bestPose1 = P(:,idx(1));
+    bestPose2 = P(:,idx(2));
     %   2-4) Choose the best particle to update the pose
     scoreFilter = min(m, minScore);
     idx = (w >= scoreFilter);
@@ -111,11 +114,16 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
 
     % 4) Visualize the pose on the map as needed
 
-   imagesc(map);
-   hold on
-   plot(myPose(1,j)*param.resol+param.origin(1), ...
-        myPose(2,j)*param.resol+param.origin(2), 'r.-');
-   drawnow limitrate
+    imagesc(map);
+    hold on
+    axis equal;
+    plot(myPose(1,j)*param.resol+param.origin(1), ...
+        myPose(2,j)*param.resol+param.origin(2), 'r.-', 'MarkerSize',20);
+    plot(bestPose1(1)*param.resol+param.origin(1), ...
+        bestPose1(2)*param.resol+param.origin(2), 'g.-', 'MarkerSize',20);
+    plot(bestPose2(1)*param.resol+param.origin(1), ...
+        bestPose2(2)*param.resol+param.origin(2), 'b.-', 'MarkerSize',20);
+    drawnow limitrate
 
 end
 
